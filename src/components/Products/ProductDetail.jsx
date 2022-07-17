@@ -94,8 +94,8 @@ export const ProductDetail = () => {
                     rows="5"
                     id="description"
                     name="description"
+                    value={productData.description ? productData.description : ""}
                   >
-                    {productData.description ? productData.description : ""}
                   </textarea>
                 </div>
               </div>

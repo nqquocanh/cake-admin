@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 // import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import AuthContext from "../../store/auth-context";
 
 const signInHandler = async (email, password) => {
   const response = await fetch(
     "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBl3rcB9zF6RKJu_jhIgtx124tIASRJXoQ",
     {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, returnSecureToken: true }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -19,6 +20,8 @@ const signInHandler = async (email, password) => {
 
 const Login = () => {
   const navigate = useNavigate();
+  const authCtx = useContext(AuthContext);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -35,6 +38,11 @@ const Login = () => {
     // valid user and password
     const response = await signInHandler(email, password);
     if (response.error) return console.log(response.error.message);
+
+    const expirationTime = new Date(
+      new Date().getTime() + +response.expiresIn * 1000
+    );
+    authCtx.login(response.idToken, expirationTime.toISOString());
     navigate("/products", { replace: true });
   };
   return (
